@@ -19,6 +19,7 @@ int offset; // how many bytes after the skip to wait until dissassembling
 int length; // how many bites to process before quitting
 int find; // is this a jump finding pass?
 int location_count; // how many locations there were given
+int rgbds; // disassemble for RGBDS syntax or WLA-GB?
 short unsigned *locations; // this is the list of locations to label
 
 // keep track of which byte we are on
@@ -96,7 +97,7 @@ void print_instruction_2_args(char *mnemonic, char *arg1, char *arg2)
 void print_directive(char *directive, int argc, char *argv[])
 {
 	if(find) return;
-	printf(".%s ", directive);
+	printf("\t%s%s\t\t", (rgbds ? "" : "."), directive);
 	int i;
 	for(i = 0; i < argc; i++)
 	{
@@ -107,7 +108,6 @@ void print_directive(char *directive, int argc, char *argv[])
 			printf(", ");
 		}
 	}
-	putchar('\n');
 }
 
 // we gotta convert relative addresses in jr instructions to absolute addresses
@@ -210,6 +210,9 @@ void print_dbs(int count, unsigned char *bytes)
 		argv[i] = arg;
 	}
 	print_directive("db", count, argv);
+	putchar('\t');
+	print_comment(count);
+	putchar('\n');
 }
 
 // print a .db line with a single byte
@@ -232,6 +235,7 @@ void print_help()
 	printf("\t--offset n\t\tdisassemble starting at n (hex) bytes\n");
 	printf("\t--length n\t\tonly process n (hex) bytes\n");
 	printf("\t--find\t\tonly find and print jump locations this pass\n");
+	printf("\t--rgbds\t\tdisassemble into RGBDS syntax (as opposed to WLA-GB)\n");
 	printf("\t--locations\t\tgive a series of locations to create labels for (must be last argument)\n");
 }
 
@@ -261,6 +265,7 @@ int main(int argc, char *argv[])
 	offset  = 0; // start at the beginning by default
 	length = 0; // no limit by default
 	find = 0; // not finding jumps unless specified, sorry!
+	rgbds = 0; // compile to WLA-GB syntax by default
 	location_count = 0; // no locations unless specified!
 
 	// loop through args
@@ -305,6 +310,10 @@ int main(int argc, char *argv[])
 			char *value = argv[++i];
 			char *end;
 			length = strtoumax(value, &end, 16);
+		}
+		else if(strcmp(arg, "--rgbds") == 0)
+		{
+			rgbds = 1;
 		}
 		else if(strcmp(arg, "--locations") == 0)
 		{
