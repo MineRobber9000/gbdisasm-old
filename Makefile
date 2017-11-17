@@ -1,14 +1,10 @@
 default_target: all
 
-all: gbdis gbinfo gen_test
+all: gbdis gen_test
 
 install:
-	cp gbdisasm /usr/local/bin
+	cp disasm /usr/local/bin
 	cp gbdis /usr/local/bin
-	cp gbinfo /usr/local/bin
-
-gbinfo:
-	gcc -o gbinfo gbinfo.c
 
 gbdis: gen_instruction_parser
 	gcc -o gbdis gbdis.c
