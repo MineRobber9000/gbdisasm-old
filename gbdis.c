@@ -210,9 +210,6 @@ void print_dbs(int count, unsigned char *bytes)
 		argv[i] = arg;
 	}
 	print_directive("db", count, argv);
-	putchar('\t');
-	print_comment(count);
-	putchar('\n');
 }
 
 // print a .db line with a single byte
@@ -221,6 +218,10 @@ void print_db(unsigned char c)
 	unsigned char bytes[1];
 	bytes[0] = c;
 	print_dbs(1, bytes);
+	putchar('\t');
+	instruction_bytes[0] = c;
+	print_comment(1);
+	putchar('\n');
 }
 
 // print some help for the options nd stuff
@@ -373,6 +374,7 @@ RETRY:
 		// just print a .db line if thats what was asked for
 		if(!find && db)
 		{
+			deal_with_labels(); // lets try this
 			print_db(c);
 			continue;
 		}

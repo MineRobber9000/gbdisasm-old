@@ -1,6 +1,12 @@
 #!/bin/bash
 
-./gbdis --length 0104 --rgbds --locations 0040 0048 0050 0058 0060 0150 < $1 > $1.asm
+echo "; disassembled with gbdisasm (https://github.com/MineRobber9000/gbdisasm)" > $1.asm
+echo "SECTION 'start',ROM0[\$0000]" >> $1.asm
+
+./gbdis --length 0104 --rgbds --locations 0040 0048 0050 0058 0060 0150 < $1 >> $1.asm
 python fixlabels.py $1.asm initial # applies helpful labels to interrupt handlers
-./gbdis --offset 0104 --length 004B --rgbds --db --locations 0104 0144 0146 0147 0148 0149 014A 014B 014D 014E < $1 >> $1.asm
+./gbdis --offset 0104 --length 004C --rgbds --db --locations 0104 0144 0146 0147 0148 0149 014A 014B 014D 014E < $1 >> $1.asm
 python fixlabels.py $1.asm header
+echo "SECTION 'bank0',ROM0[\$0150]" >> $1.asm
+./gbdis --offset 0150 --length 7EB0 --rgbds --locations $(python parse_labelscript.py $1.asm $2 parse) < $1 >> $1.asm
+python parse_labelscript.py $1.asm $2 apply
