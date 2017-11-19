@@ -1,3 +1,4 @@
+# THIS REPO IS NO LONGER IN USE, SEE [THIS ONE](https://github.com/MineRobber9000/gbdisasm).
 # gbdisasm
 
 To compile the C tool:
